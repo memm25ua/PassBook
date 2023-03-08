@@ -14,9 +14,14 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"sdshttp/srv"
-	"sdshttp/util"
+	"PASSBOOK/util"
 )
+
+type Resp struct {
+	Ok    bool   // true -> correcto, false -> error
+	Msg   string // mensaje adicional
+	Token []byte // token de sesión para utilizar por el cliente
+}
 
 // chk comprueba y sale si hay errores (ahorra escritura en programas sencillos)
 func chk(e error) {
@@ -77,7 +82,7 @@ func Run() {
 	data.Set("pass", util.Encode64(keyLogin))                 // contraseña (a base64 porque es []byte)
 	r, err = client.PostForm("https://localhost:10443", data) // enviamos por POST
 	chk(err)
-	resp := srv.Resp{}
+	resp := Resp{}
 	json.NewDecoder(r.Body).Decode(&resp) // decodificamos la respuesta para utilizar sus campos más adelante
 	fmt.Println(resp)                     // imprimimos por pantalla
 	r.Body.Close()                        // hay que cerrar el reader del body
