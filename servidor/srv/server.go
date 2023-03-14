@@ -14,6 +14,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -42,7 +43,8 @@ type user struct {
 	Seen  time.Time // última vez que fue visto
 }
 
-var uri string = "mongodb+srv://passbook.b6ormcu.mongodb.net/?authMechanism=MONGODB-X509&authSource=%24external&tlsCertificateKeyFile=X509-cert-dbkey.pem&tls=true"
+var keyFile string = "C:/Users/Madani/Desktop/SDS/PassBook/servidor/srv/X509-cert-dbkey.pem" // ruta al certificado de la base de datos
+var uri string = "mongodb+srv://passbook.b6ormcu.mongodb.net/?authMechanism=MONGODB-X509&authSource=%24external&tlsCertificateKeyFile=" + keyFile + "&tls=true"
 var serverAPIOptions = options.ServerAPI(options.ServerAPIVersion1)
 var clientOptions = options.Client().
 	ApplyURI(uri).
@@ -68,6 +70,7 @@ func handler(w http.ResponseWriter, req *http.Request) {
 
 	switch req.Form.Get("cmd") { // comprobamos comando desde el cliente
 	case "register": // ** registro
+		fmt.Println("register")
 		ok := userExists(req.Form.Get("user")) // ¿existe ya el usuario?
 
 		if ok {
@@ -143,11 +146,8 @@ func userExists(name string) bool {
 
 	var result DBUser
 	err = collection.FindOne(context.Background(), filter).Decode(&result)
-	if err != nil {
-		return false
-	}
 
-	return true
+	return err == nil
 }
 
 // función para registrar un usuario
@@ -158,11 +158,8 @@ func registerUser(u user) bool {
 	collection := client.Database("passbook").Collection("users")
 	insertResult, err := collection.InsertOne(context.Background(), u)
 	_ = insertResult
-	if err != nil {
-		return false
-	}
-
-	return true
+	fmt.Println(err)
+	return err == nil
 }
 
 // función para comprobar credenciales de un usuario
