@@ -141,7 +141,7 @@ func userExists(name string) bool {
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	chk(err)
 
-	collection := client.Database("passbook").Collection("users")
+	collection := client.Database("PassBook").Collection("users")
 	filter := bson.D{{"name", name}}
 
 	var result DBUser
@@ -163,16 +163,17 @@ func registerUser(u user) bool {
 }
 
 // función para comprobar credenciales de un usuario
-func loginUser(name, password string) (bool, user) {
+func loginUser(name string, password string) (bool, user) {
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	chk(err)
 
-	collection := client.Database("passbook").Collection("users")
-	filter := bson.D{{"Name", name}}
+	collection := client.Database("PassBook").Collection("users")
+	filter := bson.D{{"name", name}}
 
 	var result DBUser
 	err = collection.FindOne(context.Background(), filter).Decode(&result)
 	if err != nil {
+		fmt.Println(err)
 		return false, user{}
 	}
 
