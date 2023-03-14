@@ -155,7 +155,7 @@ func registerUser(u user) bool {
 	client, err := mongo.Connect(context.Background(), clientOptions)
 	chk(err)
 
-	collection := client.Database("passbook").Collection("users")
+	collection := client.Database("PassBook").Collection("users")
 	insertResult, err := collection.InsertOne(context.Background(), u)
 	_ = insertResult
 	fmt.Println(err)
